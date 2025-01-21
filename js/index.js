@@ -1,4 +1,3 @@
-// Fetch and display all products
 let getAllProducts = (query = "margarita") => {
     if (!query) {
         return;
@@ -10,7 +9,7 @@ let getAllProducts = (query = "margarita") => {
         .then((r) => r.json())
         .then((data) => {
             const container = document.getElementById("card-container");
-            container.innerHTML = ""; // Clear container
+            container.innerHTML = "";
             if (data.drinks) {
                 showData(data.drinks);
             } else {
@@ -20,28 +19,26 @@ let getAllProducts = (query = "margarita") => {
         .catch((error) => console.error("Error fetching products:", error));
 };
 
-// Event listener for search button
 document.getElementById("search-btn").addEventListener("click", () => {
     const inputText = document.getElementById("input-text").value.trim();
     if (inputText) {
         getAllProducts(inputText);
-        document.getElementById("input-text").value = ""; // Clear input field
+        document.getElementById("input-text").value = ""; 
     } else {
         alert("Please enter some text.");
     }
 });
-
-// Function to display data
 const showData = (data) => {
     console.log(data);
     const container = document.getElementById("card-container");
-    container.innerHTML = ""; // Clear container
+    container.innerHTML = ""; 
     data.forEach((drink) => {
         const div = document.createElement("div");
         div.classList.add("card");
         div.innerHTML = `
             <img class="card-img" src="${drink.strDrinkThumb || 'fallback-image.jpg'}" onclick="singleProduct('${drink.idDrink}')">
             <h5>${drink.strDrink}</h5>
+            <p>${drink.strInstructions?.slice(0, 30)}......</p>
             <button onclick="singleProduct('${drink.idDrink}')">Details</button>
             <button onclick="handleCart('${drink.strDrink}', '${drink.strDrinkThumb}', 10)">Add To Cart</button>
         `;
@@ -49,7 +46,7 @@ const showData = (data) => {
     });
 };
 
-let serial = 1; // Global serial number tracker
+let serial = 1; 
 
 const handleCart = (name, image, price) => {
     if (!name || !price) {
@@ -84,38 +81,10 @@ const handleCart = (name, image, price) => {
 
     cartContainer.appendChild(cartRow);
 
-    serial++; // Increment serial number
+    serial++; 
     updatePrice();
 };
 
-// const handleCart = (name, image, price) => {
-//     if (!name || !price) {
-//         console.error("Invalid product details");
-//         return;
-//     }
-//     const cartCount = document.getElementById('count').innerText;
-//     let convertedCount = parseFloat(cartCount);
-//     convertedCount += 1;
-
-//     const CART_LIMIT = 7;
-//     if (convertedCount > CART_LIMIT) {
-//         alert(`You can only add up to ${CART_LIMIT} products to the cart.`);
-//         return;
-//     }
-
-//     document.getElementById("count").innerText = convertedCount;
-//     const container = document.getElementById("cart-main-container");
-//     const div = document.createElement("div");
-//     div.innerHTML = `
-//         <p class="name">${convertedCount} | ${name}</p>
-//         <img class="card-img" src="${image}" alt="${name}">
-//         <hr>
-//     `;
-//     container.appendChild(div);
-//     updatePrice();
-// };
-
-// Function to update total price
 const updatePrice = () => {
     const allPrice = document.getElementsByClassName('card-price');
     let total = 0;
@@ -128,27 +97,24 @@ const updatePrice = () => {
     document.getElementById("updateTotal").innerText = total.toFixed(2);
 };
 
-// Display single product details in a modal
 const singleProduct = (id) => {
     fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${id}`)
         .then((res) => res.json())
         .then((data) => {
-            const product = data.drinks[0]; // Get the first item
+            const product = data.drinks[0]; 
             console.log("Product details fetched: ", product);
 
-            // Update modal elements
             document.getElementById("productModalLabel").innerText = product.strDrink;
             document.getElementById("modal-product-image").src = product.strDrinkThumb;
             document.getElementById("modal-product-image").alt = product.strCategory;
             document.getElementById("modal-product-description").innerText = product.strAlcoholic;
             document.getElementById("modal-product-price").innerText = `Price: $10.00`;
-
-            // Show modal using Bootstrap's API
+            document.getElementById("modal-description").innerText = product.strInstructions; 
+            // ${drink.strInstructions?.slice(0, 30)}
             const modal = new bootstrap.Modal(document.getElementById("productModal"));
             modal.show();
         })
         .catch((error) => console.error("Error fetching product details:", error));
 };
 
-// Fetch default data when the page loads
 getAllProducts();
